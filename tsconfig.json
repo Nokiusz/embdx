@@ -1,9 +1,10 @@
 {
 	"compilerOptions": {
+		"lib": ["ESNext"],
 		"module": "NodeNext",
 		"moduleResolution": "NodeNext",
-		"target": "ES2020",
-		"sourceMap": true,
+		"target": "ESNext",
+		"types": ["bun-types"],
 		"outDir": "dist"
 	},
 	"ts-node": { "esm": true },
