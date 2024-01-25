@@ -1,7 +1,6 @@
 import { Client, GatewayIntentBits, Message } from 'discord.js';
 
-import 'dotenv/config';
-import { replaceURLwithFXTwitter } from './utils/replaceMessage';
+import { replaceURLwithFXTwitter } from './utils/replaceURLwithFXTwitter';
 import { URLS } from './utils/urls';
 import { findAndSendEmoji } from './utils/findAndSendEmoji';
 

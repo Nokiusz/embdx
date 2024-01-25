@@ -1,7 +1,8 @@
 import { URLS } from './urls';
 
 export function replaceURLwithFXTwitter(messageContent: string): string {
-	let newMessageContent = 'replaceURL() called with wrong url type';
+	let newMessageContent =
+		'replaceURLwithFXTwitter() called with wrong url type';
 	if (messageContent.startsWith(URLS.twitterURL)) {
 		newMessageContent = messageContent.replace(
 			URLS.twitterURL,
