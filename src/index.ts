@@ -3,6 +3,8 @@ import { Client, GatewayIntentBits, Message } from 'discord.js';
 import { replaceURLwithFXTwitter } from './utils/replaceURLwithFXTwitter';
 import { URLS } from './utils/urls';
 import { findAndSendEmoji } from './utils/findAndSendEmoji';
+import { replaceURLwithDDInstagram } from './utils/replaceURLwithDDInstagram';
+import { replaceURLwithTfxktok } from './utils/replaceURLwithTfxktok';
 
 const client = new Client({
 	intents: [
@@ -27,6 +29,20 @@ client.on('messageCreate', async (message: Message) => {
 		content.trim().startsWith(URLS.xURL)
 	) {
 		const replacedURL = replaceURLwithFXTwitter(content.trim());
+		const userMention = `<@${message.author.id}>`;
+		await message.delete();
+		await channel.send(`${userMention}: ${replacedURL}`);
+	}
+
+	if (content.trim().startsWith(URLS.instagramURL)) {
+		const replacedURL = replaceURLwithDDInstagram(content.trim());
+		const userMention = `<@${message.author.id}>`;
+		await message.delete();
+		await channel.send(`${userMention}: ${replacedURL}`);
+	}
+
+	if (content.trim().startsWith(URLS.tiktokURL)) {
+		const replacedURL = replaceURLwithTfxktok(content.trim());
 		const userMention = `<@${message.author.id}>`;
 		await message.delete();
 		await channel.send(`${userMention}: ${replacedURL}`);
