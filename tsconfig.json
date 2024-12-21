@@ -1,12 +1,7 @@
 {
 	"compilerOptions": {
-		"lib": ["ESNext"],
-		"module": "NodeNext",
-		"moduleResolution": "NodeNext",
-		"target": "ESNext",
-		"types": ["bun-types"],
+		"skipLibCheck": true,
 		"outDir": "dist"
 	},
-	"ts-node": { "esm": true },
 	"include": ["src/**/*"]
 }
