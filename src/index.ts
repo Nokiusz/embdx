@@ -1,16 +1,8 @@
-import {
-	Client,
-	Events,
-	GatewayIntentBits,
-	Message,
-	SlashCommandBuilder,
-} from 'discord.js';
-
-import { replaceURLwithFXTwitter } from './utils/replaceURLwithFXTwitter';
-import { URLS } from './utils/urls';
+import { Client, GatewayIntentBits, Message } from 'discord.js';
 import { findAndSendEmoji } from './utils/findAndSendEmoji';
-import { replaceURLwithDDInstagram } from './utils/replaceURLwithDDInstagram';
-import { replaceURLwithTfxktok } from './utils/replaceURLwithTfxktok';
+import { HELIX_FOSSIL_ANSWERS } from './utils/consts';
+import { URL_HANDLERS } from './handlers/urlHandlers';
+import { handleDiceRoll } from './handlers/diceHandler';
 
 const client = new Client({
 	intents: [
@@ -25,92 +17,40 @@ const client = new Client({
 
 client.on('ready', async () => {
 	console.log('embdx is ready!');
-	client.user.setActivity('waiting for x/twitter links');
+	client.user.setActivity('waiting for your input :D');
 });
 
 client.on('messageCreate', async (message: Message) => {
 	const { content, channel } = message;
 	const userMention = `<@${message.author.id}>`;
-	const HELIX_FOSSIL_ANSWERS = [
-		'Yes',
-		'No',
-		'Maybe',
-		'Ask again later',
-		'Definitely',
-		'Unlikely',
-		'Absolutely',
-		'Doubtful',
-		'Signs point to yes',
-		'Signs point to no',
-		'The fossil is unclear',
-		'Try again',
-		'Fossil says no',
-		'Fossil says yes',
-		'Consult me later',
-		'Outlook good',
-		'Outlook not so good',
-		'Cannot predict now',
-		'Very likely',
-		'Very unlikely',
-	];
-	if (
-		content.trim().startsWith(URLS.twitterURL) ||
-		content.trim().startsWith(URLS.xURL) ||
-		content.trim().startsWith(URLS.tiktokURL)
-	) {
-		const replacedURL = replaceURLwithFXTwitter(content.trim());
 
-		await message.delete();
-		await channel.send(`${userMention}: ${replacedURL}`);
-	}
-
-	if (content.trim().startsWith(URLS.instagramURL)) {
-		const replacedURL = replaceURLwithDDInstagram(content.trim());
-		const userMention = `<@${message.author.id}>`;
-		await message.delete();
-		await channel.send(`${userMention}: ${replacedURL}`);
-	}
-
-	if (content.trim().startsWith(URLS.tiktokURL)) {
-		const replacedURL = replaceURLwithTfxktok(content.trim());
-		const userMention = `<@${message.author.id}>`;
-		await message.delete();
-		await channel.send(`${userMention}: ${replacedURL}`);
+	for (const { prefixes, handler } of URL_HANDLERS) {
+		if (prefixes.some((url) => content.trim().startsWith(url))) {
+			const replacedURL = handler(content.trim());
+			await message.delete();
+			await channel.send(`${userMention}: ${replacedURL}`);
+			return;
+		}
 	}
 
 	if (content.startsWith('!e ')) {
 		const emojiName = content.slice(3);
 		findAndSendEmoji(emojiName, channel, client);
+		return;
 	}
 
 	if (content.startsWith('!d')) {
-		const args = content.slice(2).split(' '); // Split the input into command and arguments
-		const sides = parseInt(args[0]); // Extract the number of sides from the arguments
-		const numDice = parseInt(args[1]); // Extract the number of dice from the arguments
-
-		if (!isNaN(numDice) && !isNaN(sides) && numDice > 0 && sides > 0) {
-			let results = [];
-			for (let i = 0; i < numDice; i++) {
-				results.push(Math.floor(Math.random() * sides) + 1);
-			}
-			const total = results.reduce((acc, result) => acc + result, 0);
-			await channel.send(
-				`${userMention}: :game_die: Rolled ${numDice} d${sides} ${results.join(
-					', ',
-				)} (Total: ${total})`,
-			);
-		} else {
-			// Invalid input, handle accordingly (e.g., inform the user)
-			await channel.send(
-				`${userMention}: Invalid input. Ple ase use !d<numSides> <numDice> to roll multiple dice.`,
-			);
-		}
+		await handleDiceRoll(content, userMention, channel);
+		return;
 	}
 
 	if (content.startsWith('!helix')) {
-		const randomIndex = Math.floor(Math.random() * HELIX_FOSSIL_ANSWERS.length);
-		const randomAnswer = HELIX_FOSSIL_ANSWERS[randomIndex];
+		const randomAnswer =
+			HELIX_FOSSIL_ANSWERS[
+				Math.floor(Math.random() * HELIX_FOSSIL_ANSWERS.length)
+			];
 		await channel.send(`${userMention}: :owl: ${randomAnswer}`);
+		return;
 	}
 });
 
